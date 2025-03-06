@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<input type=button id="start" value="위치추적시작" >
+<input type=button id="stop" value="위치추적종료" >
+<div id="result">위치결과</div>
+
+<script>
+let watchid ; 
+document.getElementById("start").onclick = function(){
+	watchid = window.navigator.geolocation.watchPosition(success, fail);
+}
+
+document.getElementById("stop").onclick = function(){
+	window.navigator.geolocation.clearWatch(watchid);
+}
+
+function success(myposition){//위치정보객체
+	//위도필수, 경도필수, 고도옵션 (북위 36-38, 동경 126-128)
+	let lat = myposition.coords.latitude;//위도
+	let lng = myposition.coords.longitude;//경도
+	document.getElementById("result").innerHTML = "나의 위도=" + lat + " , 경도=" + lng;
+	window.open("http://www.google.co.kr/maps/?q=" + lat + "," + lng, "googlemap", "width=800, height=600, resizable=yes");
+	window.open("http://map.kakao.com/?q=" + lat + "," + lng, "kakakomap", "width=300, height=300, resizable=yes");
+	window.open("http://map.naver.com/v5/?q=" + lat + "," + lng, "navermap", "width=100, height=100, resizable=yes");
+	// 주소 변환 api - ncp(유료), kakao(무료), ...-회원로그인, key 인증
+	
+}
+
+function fail(error){//오류정보객체
+	document.getElementById("result").innerHTML = "오류발생 " + error.code + " : " + error.message;
+}
+</script>
+</body>
+</html>
+
+

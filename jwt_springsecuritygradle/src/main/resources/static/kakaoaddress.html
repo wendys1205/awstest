@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<input type=button id="start" value="위치추적시작" >
+<input type=button id="stop" value="위치추적종료" >
+<div id="result">위치결과(위,경도)</div>
+<div id="result2">위치결과(주소)</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=6569b8e8934db2f30530ebc66e8b4a89&libraries=services"></script>
+
+
+<script>
+let watchid ; 
+document.getElementById("start").onclick = function(){
+	watchid = window.navigator.geolocation.watchPosition(success, fail);
+}
+
+document.getElementById("stop").onclick = function(){
+	window.navigator.geolocation.clearWatch(watchid);
+}
+
+function success(myposition){//위치정보객체
+	//위도필수, 경도필수, 고도옵션 (북위 36-38, 동경 126-128)
+	let lat = myposition.coords.latitude;//위도
+	let lng = myposition.coords.longitude;//경도
+	document.getElementById("result").innerHTML = "나의 위도=" + lat + " , 경도=" + lng;
+	//window.open("http://www.google.co.kr/maps/?q=" + lat + "," + lng, "googlemap", "width=800, height=600, resizable=yes");
+	//window.open("http://map.kakao.com/?q=" + lat + "," + lng, "kakakomap", "width=300, height=300, resizable=yes");
+	//window.open("http://map.naver.com/v5/?q=" + lat + "," + lng, "navermap", "width=100, height=100, resizable=yes");
+	
+	// 주소 변환 api - ncp(유료), kakao(무료), ...-회원로그인, key 인증
+	// 주소-좌표 변환 객체를 생성합니다
+	var geocoder = new kakao.maps.services.Geocoder();
+	//좌표를 행정동 주소 정보 변환
+	geocoder.coord2RegionCode(lng, lat,  callback);
+	function callback(result, status) {//함수 정의. 미리 정의
+	    if (status === kakao.maps.services.Status.OK) {
+	    	document.getElementById("result2").innerHTML = '지역 명칭 : ' + result[0].address_name + "<br>";
+	    	document.getElementById("result2").innerHTML += '행정구역 코드 : ' + result[0].code +"<br>";
+	    }
+	};
+	
+	//좌표를 상세 주소 정보 변환
+	geocoder.coord2Address(lng, lat, callback2);
+	function callback2(result, status) {
+	    if (status === kakao.maps.services.Status.OK) {
+	    	document.getElementById("result2").innerHTML += '상세주소 : ' + result[0].address.address_name ;
+	    }
+	};
+
+	
+}
+
+function fail(error){//오류정보객체
+	document.getElementById("result").innerHTML = "오류발생 " + error.code + " : " + error.message;
+}
+</script>
+</body>
+</html>
+
+
